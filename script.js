@@ -1,28 +1,43 @@
 document.getElementById("processBtn").addEventListener("click", async () => {
     const fileInput = document.getElementById("fileInput").files[0];
     if (!fileInput) {
-        alert("Please select a .docx file.");
+        alert("Please select a .docx or .txt file.");
         return;
     }
 
+    const fileType = fileInput.name.split('.').pop().toLowerCase();
     const reader = new FileReader();
+
     reader.onload = async function (event) {
-        const arrayBuffer = event.target.result;
+        const fileContent = event.target.result;
 
-        // Convert .docx to text
-        mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-            .then(result => {
-                const extractedText = result.value;
-                const inputs = extractInputs(extractedText);
-                document.getElementById("output").textContent = inputs.join("\n");
-
-                // Create a new downloadable file
-                createDownloadableFile(inputs);
-            })
-            .catch(err => console.error("Error reading file:", err));
+        if (fileType === "txt") {
+            // Process plain text file
+            processText(fileContent);
+        } else if (fileType === "docx") {
+            // Process .docx file using Mammoth
+            mammoth.extractRawText({ arrayBuffer: fileContent })
+                .then(result => processText(result.value))
+                .catch(err => console.error("Error reading .docx file:", err));
+        } else {
+            alert("Unsupported file type! Please upload a .docx or .txt file.");
+        }
     };
-    reader.readAsArrayBuffer(fileInput);
+
+    if (fileType === "txt") {
+        reader.readAsText(fileInput);
+    } else {
+        reader.readAsArrayBuffer(fileInput);
+    }
 });
+
+function processText(text) {
+    const inputs = extractInputs(text);
+    document.getElementById("output").textContent = inputs.join("\n");
+
+    // Create a downloadable file
+    createDownloadableFile(inputs);
+}
 
 function extractInputs(text) {
     let inputs = [];
