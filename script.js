@@ -42,15 +42,18 @@ function extractInputs(text) {
     let inputs = [];
     let isInputSection = false;
     let tempInput = [];
-
     const lines = text.split("\n");
 
     for (let line of lines) {
         line = line.trim();
+
+        // Start extracting after ">>>>INPUT"
         if (line.startsWith(">>>>INPUT")) {
             isInputSection = true;
             continue;
         }
+
+        // Stop extracting at "<<<<OUTPUT"
         if (line.startsWith("<<<<OUTPUT")) {
             isInputSection = false;
             if (tempInput.length > 0) {
@@ -59,6 +62,13 @@ function extractInputs(text) {
             }
             continue;
         }
+
+        // Skip separator lines
+        if (/^----\+----/.test(line)) {
+            continue;
+        }
+
+        // If we're in the input section
         if (isInputSection) {
             if (line === "") {
                 if (tempInput.length > 0) {
@@ -67,8 +77,17 @@ function extractInputs(text) {
                 }
                 continue;
             }
-            let cleanedLine = line.replace(/^[-•] /, "").replace(/[<]/g, "").trim();
-            tempInput.push(cleanedLine);
+
+            // Remove "1 >", "2 >", etc. from start of lines
+            line = line.replace(/^\d+\s*>/, "").trim();
+
+            // Remove unwanted characters ("-", "<", "•") and clean the line
+            let cleanedLine = line.replace(/^[-•]/, "").replace(/[<]/g, "").trim();
+
+            // Only add non-empty cleaned lines
+            if (cleanedLine !== "") {
+                tempInput.push(cleanedLine);
+            }
         }
     }
 
