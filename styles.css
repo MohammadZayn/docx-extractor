@@ -43,9 +43,10 @@ input {
     display: block;
     width: 90%;
     margin: 15px auto;
-    padding: 8px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    font-size: 16px;
 }
 
 /* 🔹 Buttons */
@@ -53,12 +54,13 @@ button {
     background: #007BFF;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 20px;
     margin-top: 10px;
     cursor: pointer;
     font-size: 16px;
     border-radius: 5px;
     transition: 0.3s;
+    width: 90%;
 }
 
 button:hover {
@@ -85,4 +87,47 @@ pre {
 /* 🔹 Hidden Elements */
 .hidden {
     display: none;
+}
+
+/* 🔹 Error Message */
+#error-message {
+    color: red;
+    display: none;
+    margin-top: 10px;
+}
+
+/* 🔹 Login Box Styling */
+.login-container {
+    background: white;
+    width: 320px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.login-container h2 {
+    color: #333;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-container button:hover {
+    background-color: #218838;
 }
