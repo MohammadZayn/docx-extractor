@@ -13,29 +13,24 @@ document.getElementById("processBtn").addEventListener("click", async () => {
         mammoth.extractRawText({ arrayBuffer: arrayBuffer })
             .then(result => {
                 const extractedText = result.value;
-                const groupedInputs = extractInputsByScenario(extractedText);
-                
-                // Display formatted output
-                document.getElementById("output").innerHTML = formatExtractedData(groupedInputs);
+                const inputs = extractInputs(extractedText);
+                document.getElementById("output").textContent = inputs.join("\n");
 
-                // Create downloadable file
-                createDownloadableFile(groupedInputs);
+                // Create a new downloadable file
+                createDownloadableFile(inputs);
             })
             .catch(err => console.error("Error reading file:", err));
     };
     reader.readAsArrayBuffer(fileInput);
 });
 
-function extractInputsByScenario(text) {
-    let scenarios = {};
-    let currentScenario = "General";
+function extractInputs(text) {
+    let inputs = [];
     let isInputSection = false;
-    
     const lines = text.split("\n");
 
     for (let line of lines) {
         line = line.trim();
-
         if (line.startsWith(">>>>INPUT")) {
             isInputSection = true;
             continue;
@@ -44,48 +39,17 @@ function extractInputsByScenario(text) {
             isInputSection = false;
             continue;
         }
-
-        // Detect scenario name if present
-        if (isInputSection && line.startsWith("Scenario:")) {
-            currentScenario = line.replace("Scenario:", "").trim();
-            scenarios[currentScenario] = [];
-            continue;
-        }
-
         if (isInputSection && line.startsWith("1 >")) {
-            let cleanedInput = line.substring(3).trim(); // Remove "1 >" marker
-            if (!scenarios[currentScenario]) {
-                scenarios[currentScenario] = [];
-            }
-            scenarios[currentScenario].push(cleanedInput);
+            // Remove "•" and "<"
+            let cleanedLine = line.substring(3).replace(/[•<]/g, "").trim();
+            inputs.push(cleanedLine);
         }
     }
-
-    return scenarios;
+    return inputs;
 }
 
-function formatExtractedData(groupedInputs) {
-    let outputHTML = "";
-    for (let scenario in groupedInputs) {
-        outputHTML += `<strong>${scenario}</strong><br>`;
-        groupedInputs[scenario].forEach(input => {
-            outputHTML += `• ${input}<br>`;
-        });
-        outputHTML += "<br>";
-    }
-    return outputHTML;
-}
-
-function createDownloadableFile(groupedInputs) {
-    let outputText = "";
-    for (let scenario in groupedInputs) {
-        outputText += `${scenario}\n`;
-        groupedInputs[scenario].forEach(input => {
-            outputText += `- ${input}\n`;
-        });
-        outputText += "\n";
-    }
-
+function createDownloadableFile(inputs) {
+    const outputText = "\nExtracted Inputs:\n" + inputs.join("\n");
     const blob = new Blob([outputText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
 
