@@ -5,83 +5,75 @@ document.getElementById("processBtn").addEventListener("click", async () => {
         return;
     }
 
-    const fileType = fileInput.name.split('.').pop().toLowerCase();
     const reader = new FileReader();
+    const fileName = fileInput.name.toLowerCase();
 
     reader.onload = async function (event) {
-        const fileContent = event.target.result;
+        const arrayBuffer = event.target.result;
 
-        if (fileType === "txt") {
-            // Process plain text file
-            processText(fileContent);
-        } else if (fileType === "docx") {
-            // Process .docx file using Mammoth
-            mammoth.extractRawText({ arrayBuffer: fileContent })
-                .then(result => processText(result.value))
+        if (fileName.endsWith(".docx")) {
+            // Convert .docx to text
+            mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+                .then(result => {
+                    processExtractedText(result.value);
+                })
                 .catch(err => console.error("Error reading .docx file:", err));
+        } else if (fileName.endsWith(".txt")) {
+            // Process .txt file
+            const extractedText = new TextDecoder().decode(arrayBuffer);
+            processExtractedText(extractedText);
         } else {
-            alert("Unsupported file type! Please upload a .docx or .txt file.");
+            alert("Unsupported file format! Please upload a .docx or .txt file.");
         }
     };
 
-    if (fileType === "txt") {
-        reader.readAsText(fileInput);
-    } else {
-        reader.readAsArrayBuffer(fileInput);
-    }
+    reader.readAsArrayBuffer(fileInput);
 });
 
-function processText(text) {
+function processExtractedText(text) {
     const inputs = extractInputs(text);
     document.getElementById("output").textContent = inputs.join("\n");
 
-    // Create a downloadable file
+    // Create a new downloadable file
     createDownloadableFile(inputs);
 }
 
 function extractInputs(text) {
     let inputs = [];
     let isInputSection = false;
-    let currentInputBlock = [];
+    let tempInput = [];
+
     const lines = text.split("\n");
 
     for (let line of lines) {
         line = line.trim();
-
-        // Start collecting inputs
         if (line.startsWith(">>>>INPUT")) {
             isInputSection = true;
             continue;
         }
-        // Stop collecting when OUTPUT section starts
         if (line.startsWith("<<<<OUTPUT")) {
             isInputSection = false;
-            if (currentInputBlock.length > 0) {
-                inputs.push(currentInputBlock.join(" ")); // Merge multiline input
-                currentInputBlock = [];
+            if (tempInput.length > 0) {
+                inputs.push(tempInput.join(" ")); // Merge continuous input lines
+                tempInput = [];
             }
             continue;
         }
-
-        // Process inputs while inside INPUT section
         if (isInputSection) {
             if (line === "") {
-                // If empty line appears, store the collected block and reset
-                if (currentInputBlock.length > 0) {
-                    inputs.push(currentInputBlock.join(" "));
-                    currentInputBlock = [];
+                if (tempInput.length > 0) {
+                    inputs.push(tempInput.join(" ")); // Merge and store
+                    tempInput = [];
                 }
-            } else {
-                // Remove unnecessary characters ("-", "<") and store
-                let cleanedLine = line.replace(/^- /, "").replace(/[<]/g, "").trim();
-                currentInputBlock.push(cleanedLine);
+                continue;
             }
+            let cleanedLine = line.replace(/^[-•] /, "").replace(/[<]/g, "").trim();
+            tempInput.push(cleanedLine);
         }
     }
 
-    // Ensure last collected input block is added
-    if (currentInputBlock.length > 0) {
-        inputs.push(currentInputBlock.join(" "));
+    if (tempInput.length > 0) {
+        inputs.push(tempInput.join(" ")); // Add last collected input
     }
 
     return inputs;
