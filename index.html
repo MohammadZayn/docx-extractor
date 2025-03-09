@@ -10,10 +10,10 @@
 </head>
 <body>
 
-    <!-- 🚀 Security Script: Restrict Access -->
+    <!-- 🚀 Security Script: Restrict Unauthorized Access -->
     <script>
         if (localStorage.getItem("isLoggedIn") !== "true") {
-            window.location.href = "login.html";
+            window.location.href = "login.html"; // Redirect to login if not logged in
         }
     </script>
 
@@ -36,10 +36,11 @@
         <button id="logoutBtn">Logout</button>
     </div>
 
+    <!-- 🚀 Logout Script -->
     <script>
         function logout() {
-            localStorage.removeItem("isLoggedIn");
-            window.location.href = "login.html";
+            localStorage.removeItem("isLoggedIn"); // Clear login status
+            window.location.href = "login.html"; // Redirect to login page
         }
 
         // Attach logout function to button
