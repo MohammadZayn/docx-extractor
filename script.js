@@ -40,8 +40,8 @@ function extractInputs(text) {
             continue;
         }
         if (isInputSection && line.startsWith("1 >")) {
-            // Remove "•" and "<"
-            let cleanedLine = line.substring(3).replace(/[•<]/g, "").trim();
+            // Remove "- ", "<", and trim the result
+            let cleanedLine = line.substring(3).replace(/^- /, "").replace(/[<]/g, "").trim();
             inputs.push(cleanedLine);
         }
     }
