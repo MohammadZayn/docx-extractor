@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Docx Extractor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="checkLogin()">Login</button>
+        <p id="error-message" style="color: red; display: none;">Invalid credentials!</p>
+    </div>
+
+    <script>
+        function checkLogin() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            // Set your own username & password here
+            const correctUsername = "admin";
+            const correctPassword = "1234";
+
+            if (username === correctUsername && password === correctPassword) {
+                localStorage.setItem("isLoggedIn", "true");
+                window.location.href = "index.html";  // Redirect to main page
+            } else {
+                document.getElementById("error-message").style.display = "block";
+            }
+        }
+
+        // Prevent access if already logged in
+        if (localStorage.getItem("isLoggedIn") === "true") {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
