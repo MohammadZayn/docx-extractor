@@ -17,10 +17,10 @@
 
     <script>
         function checkLogin() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
 
-            // Set your own username & password here
+            // Correct username & password (case-sensitive)
             const correctUsername = "Mohammad";
             const correctPassword = "Shaik";
 
