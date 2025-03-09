@@ -57,7 +57,7 @@ function extractInputs(text) {
         if (line.startsWith("<<<<OUTPUT")) {
             isInputSection = false;
             if (tempInput.length > 0) {
-                inputs.push(tempInput.join(" ")); // Merge continuous input lines
+                inputs.push(tempInput.join(" ")); // Merge collected input lines
                 tempInput = [];
             }
             continue;
@@ -72,14 +72,14 @@ function extractInputs(text) {
         if (isInputSection) {
             if (line === "") {
                 if (tempInput.length > 0) {
-                    inputs.push(tempInput.join(" ")); // Merge and store
+                    inputs.push(tempInput.join(" ")); // Merge collected lines
                     tempInput = [];
                 }
                 continue;
             }
 
-            // Remove "1 >", "2 >", etc. from start of lines
-            line = line.replace(/^\d+\s*>/, "").trim();
+            // Remove "1 >", "2 >", "3 >", etc., from start of lines
+            line = line.replace(/^\d+\s*>?\s*/, "").trim();
 
             // Remove unwanted characters ("-", "<", "•") and clean the line
             let cleanedLine = line.replace(/^[-•]/, "").replace(/[<]/g, "").trim();
