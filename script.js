@@ -13,24 +13,29 @@ document.getElementById("processBtn").addEventListener("click", async () => {
         mammoth.extractRawText({ arrayBuffer: arrayBuffer })
             .then(result => {
                 const extractedText = result.value;
-                const inputs = extractInputs(extractedText);
-                document.getElementById("output").textContent = inputs.join("\n");
+                const groupedInputs = extractInputsByScenario(extractedText);
+                
+                // Display formatted output
+                document.getElementById("output").innerHTML = formatExtractedData(groupedInputs);
 
-                // Create a new downloadable file
-                createDownloadableFile(inputs);
+                // Create downloadable file
+                createDownloadableFile(groupedInputs);
             })
             .catch(err => console.error("Error reading file:", err));
     };
     reader.readAsArrayBuffer(fileInput);
 });
 
-function extractInputs(text) {
-    let inputs = [];
+function extractInputsByScenario(text) {
+    let scenarios = {};
+    let currentScenario = "General";
     let isInputSection = false;
+    
     const lines = text.split("\n");
 
     for (let line of lines) {
         line = line.trim();
+
         if (line.startsWith(">>>>INPUT")) {
             isInputSection = true;
             continue;
@@ -39,15 +44,48 @@ function extractInputs(text) {
             isInputSection = false;
             continue;
         }
+
+        // Detect scenario name if present
+        if (isInputSection && line.startsWith("Scenario:")) {
+            currentScenario = line.replace("Scenario:", "").trim();
+            scenarios[currentScenario] = [];
+            continue;
+        }
+
         if (isInputSection && line.startsWith("1 >")) {
-            inputs.push(line.substring(3).trim());
+            let cleanedInput = line.substring(3).trim(); // Remove "1 >" marker
+            if (!scenarios[currentScenario]) {
+                scenarios[currentScenario] = [];
+            }
+            scenarios[currentScenario].push(cleanedInput);
         }
     }
-    return inputs;
+
+    return scenarios;
 }
 
-function createDownloadableFile(inputs) {
-    const outputText = "\nExtracted Inputs:\n" + inputs.join("\n");
+function formatExtractedData(groupedInputs) {
+    let outputHTML = "";
+    for (let scenario in groupedInputs) {
+        outputHTML += `<strong>${scenario}</strong><br>`;
+        groupedInputs[scenario].forEach(input => {
+            outputHTML += `• ${input}<br>`;
+        });
+        outputHTML += "<br>";
+    }
+    return outputHTML;
+}
+
+function createDownloadableFile(groupedInputs) {
+    let outputText = "";
+    for (let scenario in groupedInputs) {
+        outputText += `${scenario}\n`;
+        groupedInputs[scenario].forEach(input => {
+            outputText += `- ${input}\n`;
+        });
+        outputText += "\n";
+    }
+
     const blob = new Blob([outputText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
 
