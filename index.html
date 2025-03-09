@@ -6,13 +6,23 @@
     <title>Docx Input Extractor</title>
     <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
     <script defer src="script.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Upload a .docx File</h2>
-    <input type="file" id="fileInput" accept=".docx">
-    <button id="processBtn">Extract Inputs</button>
-    <p><strong>Extracted Inputs:</strong></p>
-    <pre id="output"></pre>
-    <button id="downloadBtn" style="display:none;">Download Updated File</button>
+    <div class="container">
+        <img src="logo.png" alt="Docx Extractor Logo" class="logo">
+        <h1>Docx Input Extractor</h1>
+        <p>Upload a .docx file to extract inputs and download the updated version.</p>
+
+        <input type="file" id="fileInput" accept=".docx">
+        <button id="processBtn">Extract Inputs</button>
+
+        <div class="output-box">
+            <h3>Extracted Inputs:</h3>
+            <pre id="output"></pre>
+        </div>
+
+        <button id="downloadBtn" class="hidden">Download Updated File</button>
+    </div>
 </body>
 </html>
