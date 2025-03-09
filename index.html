@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- 🚀 Security Script: Restrict Access -->
+    <script>
+        if (localStorage.getItem("isLoggedIn") !== "true") {
+            window.location.href = "login.html";
+        }
+    </script>
+
     <div class="container">
         <img src="logo.png" alt="Docx Extractor Logo" class="logo">
         <h1>Docx Input Extractor</h1>
@@ -23,6 +31,20 @@
         </div>
 
         <button id="downloadBtn" class="hidden">Download Updated File</button>
+
+        <!-- 🚀 Logout Button -->
+        <button id="logoutBtn">Logout</button>
     </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem("isLoggedIn");
+            window.location.href = "login.html";
+        }
+
+        // Attach logout function to button
+        document.getElementById("logoutBtn").addEventListener("click", logout);
+    </script>
+
 </body>
 </html>
